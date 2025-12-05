@@ -34,4 +34,5 @@ export const TARGET_LOCATIONS: LocationTarget[] = [
   { id: 'renton', name: 'Renton', lat: 47.470826179776566, lng: -122.23386552805387 },
   { id: 'everett', name: 'Everett', lat: 47.907556185455604, lng: -122.23426400229107 },
   { id: 'vancouver', name: 'Vancouver', lat: 45.65842399116114, lng: -122.59338621772888 },
+  { id: 'kirkland', name: 'Kirkland', lat: 47.70997319790552, lng: -122.19003647346379 },
 ];

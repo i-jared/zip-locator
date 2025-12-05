@@ -4,8 +4,7 @@ import { calculateDistance, TARGET_LOCATIONS, LocationTarget } from './utils';
 
 interface SearchResult {
   queryZip: string;
-  closestLocation: LocationTarget;
-  distance: number;
+  closestLocations: { location: LocationTarget; distance: number }[];
   id: string; // unique id for key
 }
 
@@ -50,23 +49,19 @@ const App: React.FC = () => {
       return;
     }
 
-    // Find closest location
-    let minDistance = Infinity;
-    let closest: LocationTarget | null = null;
+    // Find closest locations
+    const distances = TARGET_LOCATIONS.map(loc => ({
+      location: loc,
+      distance: calculateDistance(coord.lat, coord.lng, loc.lat, loc.lng)
+    }));
 
-    TARGET_LOCATIONS.forEach(loc => {
-      const dist = calculateDistance(coord.lat, coord.lng, loc.lat, loc.lng);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closest = loc;
-      }
-    });
+    distances.sort((a, b) => a.distance - b.distance);
+    const closestTwo = distances.slice(0, 2);
 
-    if (closest) {
+    if (closestTwo.length > 0) {
       const newResult: SearchResult = {
         queryZip: zip,
-        closestLocation: closest,
-        distance: minDistance,
+        closestLocations: closestTwo,
         id: Date.now().toString() + Math.random().toString()
       };
 
@@ -128,12 +123,16 @@ const App: React.FC = () => {
                 <span className="text-lg font-mono text-neutral-900">{res.queryZip}</span>
               </div>
 
-              <div className="flex flex-col items-end">
+              <div className="flex flex-col items-end space-y-1">
                 <span className="text-xs font-bold text-neutral-600 uppercase tracking-wider">Nearest</span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-neutral-900">{res.closestLocation.name}</span>
-                  <span className="text-xs text-neutral-600 font-mono">({res.distance.toFixed(1)} mi)</span>
-                </div>
+                {res.closestLocations.map((loc, i) => (
+                  <div key={i} className="flex items-baseline gap-2 justify-end">
+                    <span className={`font-bold text-neutral-900 ${i === 0 ? 'text-xl' : 'text-base text-neutral-700'}`}>
+                      {loc.location.name}
+                    </span>
+                    <span className="text-xs text-neutral-600 font-mono">({loc.distance.toFixed(1)} mi)</span>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
